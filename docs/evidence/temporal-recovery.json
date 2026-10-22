@@ -1,0 +1,72 @@
+{
+  "testedAt": "2026-10-22T08:44:39.258Z",
+  "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+  "workflowId": "recovery-3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+  "baselinePreserved": true,
+  "outcome": "patch_verified",
+  "events": [
+    {
+      "id": 65,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "queued",
+      "message": "Investigation added to the local queue.",
+      "at": "2026-10-22T08:44:13.967Z"
+    },
+    {
+      "id": 66,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "preflight",
+      "message": "Preparing an isolated source copy; original files remain untouched.",
+      "at": "2026-10-22T08:44:14.330Z"
+    },
+    {
+      "id": 67,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "reproducing",
+      "message": "Launching local Chromium and replaying the reproduction steps.",
+      "at": "2026-10-22T08:44:14.349Z"
+    },
+    {
+      "id": 68,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "reproducing",
+      "message": "Captured the failing baseline and its browser trace.",
+      "at": "2026-10-22T08:44:20.815Z"
+    },
+    {
+      "id": 69,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "analyzing",
+      "message": "Applying the explicitly selected deterministic fixture repair. No model is used.",
+      "at": "2026-10-22T08:44:20.819Z"
+    },
+    {
+      "id": 70,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "patching",
+      "message": "Validating exact edits and applying them only to the isolated candidate.",
+      "at": "2026-10-22T08:44:20.825Z"
+    },
+    {
+      "id": 71,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "patching",
+      "message": "Validating exact edits and applying them only to the isolated candidate.",
+      "at": "2026-10-22T08:44:37.497Z"
+    },
+    {
+      "id": 72,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "verifying",
+      "message": "Replaying the same browser assertions against the patched candidate.",
+      "at": "2026-10-22T08:44:37.535Z"
+    },
+    {
+      "id": 73,
+      "runId": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "stage": "completed",
+      "message": "Candidate passes the specified reproduction checks. Review the diff; broader correctness still needs human review.",
+      "at": "2026-10-22T08:44:38.957Z"
+    }
+  ]
+}

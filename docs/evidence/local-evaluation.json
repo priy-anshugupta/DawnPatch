@@ -1,0 +1,226 @@
+{
+  "evaluatedAt": "2026-10-22T09:15:09.408Z",
+  "scope": "Development sample, not a representative repair benchmark",
+  "runs": [
+    {
+      "id": "2682f816-c97e-4a36-962a-cb5e227d6174",
+      "fixture": "pagination",
+      "engine": "gemma",
+      "model": "gemma3:1b",
+      "status": "failed",
+      "outcome": "pending",
+      "baselinePass": false,
+      "candidatePass": null,
+      "error": "Mastra analysis did not complete: [object Object]",
+      "usage": {
+        "model": "gemma3:1b",
+        "inputTokens": 866,
+        "outputTokens": 1800,
+        "durationMs": 97793,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T09:10:32.753Z"
+    },
+    {
+      "id": "2ae16b0e-1ffe-44e6-b19d-a26ed8d347cb",
+      "fixture": "form",
+      "engine": "gemma",
+      "model": "gemma3:1b",
+      "status": "failed",
+      "outcome": "pending",
+      "baselinePass": false,
+      "candidatePass": null,
+      "error": "Patch must match exactly once in index.html.",
+      "usage": {
+        "model": "gemma3:1b",
+        "inputTokens": 3591,
+        "outputTokens": 495,
+        "durationMs": 64537,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T09:06:27.204Z"
+    },
+    {
+      "id": "3ca7b773-6fad-41e7-bd3c-a40c86425afe",
+      "fixture": "pagination",
+      "engine": "fixture",
+      "model": "Deterministic fixture repair",
+      "status": "awaiting_review",
+      "outcome": "patch_verified",
+      "baselinePass": false,
+      "candidatePass": true,
+      "error": null,
+      "usage": {
+        "model": "Deterministic fixture repair",
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 0,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:44:13.964Z"
+    },
+    {
+      "id": "ad3af56c-030d-4e75-9980-0a3990919225",
+      "fixture": "form",
+      "engine": "gemma",
+      "model": "gemma3:1b",
+      "status": "failed",
+      "outcome": "pending",
+      "baselinePass": false,
+      "candidatePass": null,
+      "error": "Patch must match exactly once in index.html.",
+      "usage": {
+        "model": "gemma3:1b",
+        "inputTokens": 1715,
+        "outputTokens": 272,
+        "durationMs": 50703,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:40:42.845Z"
+    },
+    {
+      "id": "7ca8ef86-ff41-4b7e-922b-dbe2d165e22b",
+      "fixture": "form",
+      "engine": "fixture",
+      "model": "Deterministic fixture repair",
+      "status": "completed",
+      "outcome": "patch_verified",
+      "baselinePass": false,
+      "candidatePass": true,
+      "error": null,
+      "usage": {
+        "model": "Deterministic fixture repair",
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 0,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:39:41.079Z"
+    },
+    {
+      "id": "21763364-2a1b-47c5-a2c4-fc5f50b4400c",
+      "fixture": "empty",
+      "engine": "fixture",
+      "model": "Deterministic fixture repair",
+      "status": "completed",
+      "outcome": "patch_verified",
+      "baselinePass": false,
+      "candidatePass": true,
+      "error": null,
+      "usage": {
+        "model": "Deterministic fixture repair",
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 0,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:39:32.787Z"
+    },
+    {
+      "id": "20357262-60c0-4ae6-b4eb-3bb8e774e5f6",
+      "fixture": "pagination",
+      "engine": "fixture",
+      "model": "Deterministic fixture repair",
+      "status": "completed",
+      "outcome": "patch_verified",
+      "baselinePass": false,
+      "candidatePass": true,
+      "error": null,
+      "usage": {
+        "model": "Deterministic fixture repair",
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 0,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:39:23.454Z"
+    },
+    {
+      "id": "907de9b0-b8eb-4748-b136-97cadfce1a0c",
+      "fixture": "form",
+      "engine": "fixture",
+      "model": "Deterministic fixture repair",
+      "status": "awaiting_review",
+      "outcome": "patch_verified",
+      "baselinePass": false,
+      "candidatePass": true,
+      "error": null,
+      "usage": {
+        "model": "Deterministic fixture repair",
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 0,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:34:28.378Z"
+    },
+    {
+      "id": "7dc10b30-c3f7-4598-98f4-bc2a6f5a1853",
+      "fixture": "pagination",
+      "engine": "gemma",
+      "model": "gemma3:1b",
+      "status": "failed",
+      "outcome": "pending",
+      "baselinePass": false,
+      "candidatePass": null,
+      "error": "Patch must match exactly once in index.html.",
+      "usage": {
+        "model": "gemma3:1b",
+        "inputTokens": 1383,
+        "outputTokens": 163,
+        "durationMs": 39491,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:34:23.818Z"
+    },
+    {
+      "id": "30e20f6b-c28f-4a64-ac79-b1d20c785820",
+      "fixture": "empty",
+      "engine": "fixture",
+      "model": "Deterministic fixture repair",
+      "status": "awaiting_review",
+      "outcome": "patch_verified",
+      "baselinePass": false,
+      "candidatePass": true,
+      "error": null,
+      "usage": {
+        "model": "Deterministic fixture repair",
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 0,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:34:18.256Z"
+    },
+    {
+      "id": "fd16db16-4782-4b58-a39d-75af41df629a",
+      "fixture": "pagination",
+      "engine": "fixture",
+      "model": "Deterministic fixture repair",
+      "status": "awaiting_review",
+      "outcome": "patch_verified",
+      "baselinePass": false,
+      "candidatePass": true,
+      "error": null,
+      "usage": {
+        "model": "Deterministic fixture repair",
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 0,
+        "searches": 0,
+        "cost": null
+      },
+      "createdAt": "2026-10-22T08:34:07.723Z"
+    }
+  ]
+}
