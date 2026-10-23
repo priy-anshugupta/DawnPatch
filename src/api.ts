@@ -10,6 +10,10 @@ export async function api<T = any>(
       "X-DawnPatch": "local-workbench",
     },
     body: body === undefined ? undefined : JSON.stringify(body),
+  }).catch(() => {
+    throw new Error(
+      "DawnPatch's local server is unavailable. Check that it is running.",
+    );
   });
   if (!r.ok) {
     const data = await r.json().catch(() => ({ error: r.statusText }));
