@@ -21,6 +21,7 @@ if (process.env.SENTRY_DSN)
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: "local",
+    traceLifecycle: "static",
     tracesSampleRate: 1,
     beforeSend(e) {
       delete e.request;
