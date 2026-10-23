@@ -1,13 +1,24 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
-import { execFile } from "node:child_process";
+import { execFile, type ExecFileOptions } from "node:child_process";
 import { promisify } from "node:util";
 import { config, dataDir } from "./config.ts";
 import type { Run, Change } from "../shared/types.ts";
 import { fixtureHTML } from "./fixtures.ts";
 import { createTwoFilesPatch } from "diff";
-export const exec = promisify(execFile);
+const executeFile = promisify(execFile);
+export async function exec(
+  file: string,
+  args: string[],
+  options: ExecFileOptions = {},
+) {
+  return executeFile(file, args, {
+    ...options,
+    encoding: "utf8" as const,
+    windowsHide: true,
+  });
+}
 export const workspace = (id: string, side = "baseline") =>
   path.join(dataDir, "runs", id, side);
 export const artifactDir = (id: string) =>
@@ -97,30 +108,65 @@ export async function prepare(run: Run) {
 }
 export async function contextFiles(run: Run) {
   const base = workspace(run.id);
-  const result: { file: string; content: string }[] = [];
-  let total = 0;
+  const candidates: { file: string; content: string; score: number }[] = [];
+  const terms = [
+    ...new Set(
+      `${run.input.title} ${run.input.description}`
+        .toLowerCase()
+        .match(/[a-z]{4,}/g) || [],
+    ),
+  ];
   async function walk(dir: string) {
     for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
-      if (total > 40000 || result.length >= 25) return;
       const full = path.join(dir, entry.name);
+      const file = path.relative(base, full).replaceAll("\\", "/");
+      if (deny.test(file) || entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) await walk(full);
       else {
-        const file = path.relative(base, full).replaceAll("\\", "/");
         if (!allowedFile(file)) continue;
+        if ((await fs.stat(full)).size > 14000) continue;
         const text = await fs.readFile(full, "utf8");
         if (text.length > 14000) continue;
-        total += text.length;
-        result.push({ file, content: text });
+        const executable = /\.(tsx?|jsx?|vue|svelte|html)$/.test(file);
+        const lower = text.toLowerCase();
+        const relevance = terms.reduce(
+          (score, term) =>
+            score +
+            (lower.includes(term) ? 1 : 0) +
+            (file.toLowerCase().includes(term) ? 3 : 0),
+          0,
+        );
+        candidates.push({
+          file,
+          content: text,
+          score:
+            (executable ? 100 : 0) +
+            (file.startsWith("src/") ? 20 : 0) +
+            relevance,
+        });
       }
     }
   }
   await walk(base);
+  candidates.sort((a, b) => b.score - a.score || a.file.localeCompare(b.file));
+  const result: { file: string; content: string }[] = [];
+  let total = 0;
+  for (const candidate of candidates) {
+    if (result.length >= 25) break;
+    if (total + candidate.content.length > config.sourceContextChars) continue;
+    total += candidate.content.length;
+    result.push({ file: candidate.file, content: candidate.content });
+  }
   return result;
 }
 export async function applyChanges(run: Run, changes: Change[]) {
   if (!changes.length)
     throw new Error("The model did not propose an applicable patch.");
   if (changes.length > 5) throw new Error("Patch exceeds the five-edit limit.");
+  if (changes.some((change) => change.search === change.replace))
+    throw new Error(
+      "The proposed edit leaves the source unchanged. Propose a real source correction or return no edits.",
+    );
   const base = workspace(run.id),
     candidate = workspace(run.id, "candidate");
   await fs.cp(base, candidate, {
@@ -135,7 +181,13 @@ export async function applyChanges(run: Run, changes: Change[]) {
     const target = path.resolve(candidate, change.file);
     if (!contained(candidate, target))
       throw new Error("Patch escapes isolated workspace.");
-    const st = await fs.lstat(target);
+    const st = await fs.lstat(target).catch((error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT")
+        throw new Error(
+          `The proposed patch references a source file that does not exist: ${change.file}`,
+        );
+      throw error;
+    });
     if (!st.isFile() || st.isSymbolicLink())
       throw new Error("Only existing regular source files may be changed.");
     const before = await fs.readFile(target, "utf8");
@@ -173,7 +225,7 @@ export async function patchText(run: Run) {
 const containers = new Map<string, string[]>();
 export async function cleanup(id: string) {
   for (const name of containers.get(id) || []) {
-    await exec("docker", ["rm", "-f", name], { timeout: 15000 }).catch(
+    await exec("docker", ["rm", "-f", "-v", name], { timeout: 15000 }).catch(
       () => {},
     );
   }
@@ -195,7 +247,7 @@ export async function preview(run: Run, side: "baseline" | "candidate") {
   const name = `dawnpatch-${run.id.slice(0, 8)}-${side}`;
   const command =
     run.input.recipe === "vite"
-      ? "npm ci --no-audit --no-fund && npm run build && npm run preview -- --host 0.0.0.0 --port 4173"
+      ? "npm ci --no-audit --no-fund && npm run build && npx --no-install vite preview --host 0.0.0.0 --port 4173"
       : "npm ci --no-audit --no-fund && npm run build && npx --no-install next start --hostname 0.0.0.0 --port 4173";
   await exec(
     "docker",
@@ -213,6 +265,8 @@ export async function preview(run: Run, side: "baseline" | "candidate") {
       "127.0.0.1::4173",
       "--mount",
       `type=bind,source=${workspace(run.id, side)},target=/app`,
+      "--mount",
+      "type=volume,target=/app/node_modules",
       "--workdir",
       "/app",
       config.image,
@@ -226,9 +280,25 @@ export async function preview(run: Run, side: "baseline" | "candidate") {
   const { stdout } = await exec("docker", ["port", name, "4173/tcp"]);
   const port = stdout.trim().split(":").pop();
   const url = `http://127.0.0.1:${port}`;
-  for (let i = 0; i < 150; i++) {
+  const deadline = Date.now() + 300000;
+  for (let i = 0; Date.now() < deadline; i++) {
     if ((await import("./db.ts")).getRun(run.id).status === "cancelled")
       throw new Error("Investigation cancelled.");
+    if (i % 5 === 0) {
+      const { stdout: state } = await exec(
+        "docker",
+        ["inspect", "--format", "{{.State.Status}}", name],
+        { timeout: 10000 },
+      );
+      if (["exited", "dead"].includes(state.trim())) {
+        const log = await exec("docker", ["logs", "--tail", "25", name], {
+          timeout: 10000,
+        });
+        throw new Error(
+          `Sandbox build or preview exited before becoming ready. ${(log.stdout + log.stderr).slice(-2000)}`,
+        );
+      }
+    }
     try {
       const r = await fetch(url, { signal: AbortSignal.timeout(1500) });
       if (r.ok) return url;

@@ -13,12 +13,58 @@ const {
   applyChanges,
   hashCandidate,
   workspace,
+  contextFiles,
 } = await import("../server/workspaces.ts");
 const { createRun, getRun, patchRun, claimOccurrence } =
   await import("../server/db.ts");
 const { fixtureInput, fixtureChange } = await import("../server/fixtures.ts");
 const { nextOccurrence, localParts } = await import("../server/scheduler.ts");
 const { approve } = await import("../server/github.ts");
+const { repairOutputForFiles } = await import("../server/agent.ts");
+
+test("structured repairs reject filenames absent from the supplied source context", () => {
+  const schema = repairOutputForFiles(["src/Challenges.tsx"]);
+  const proposal = {
+    summary: "Fix filter",
+    hypothesis: "Reversed comparison",
+    edits: [
+      {
+        relativeFilePath: "src/missions.ts",
+        exactOldCode: "a >= b",
+        correctedNewCode: "a <= b",
+      },
+    ],
+    limitations: [],
+  };
+  assert.equal(schema.safeParse(proposal).success, false);
+  proposal.edits[0].relativeFilePath = "src/Challenges.tsx";
+  assert.equal(schema.safeParse(proposal).success, true);
+});
+
+test("source context retains relevant executable code when documentation fills the budget", async () => {
+  const run = createRun({
+    ...fixtureInput("pagination"),
+    title: "Mission duration filter",
+    description: "A mission filter ignores the selected duration.",
+  });
+  await prepare(run);
+  const base = workspace(run.id);
+  await fs.mkdir(path.join(base, "docs"), { recursive: true });
+  for (let n = 0; n < 5; n++)
+    await fs.writeFile(
+      path.join(base, "docs", `${n}.md`),
+      "documentation ".repeat(900),
+    );
+  await fs.mkdir(path.join(base, "src"), { recursive: true });
+  await fs.writeFile(
+    path.join(base, "src", "Missions.tsx"),
+    "const shown = missions.filter(m => m.minutes >= duration);",
+  );
+  const files = await contextFiles(run);
+  assert(files.some((f) => f.file === "src/Missions.tsx"));
+  assert(files.reduce((n, f) => n + f.content.length, 0) <= 12000);
+  assert(files.every((f) => !f.file.startsWith("node_modules/")));
+});
 test("edit policy rejects escapes, secrets, dependencies and build configuration", () => {
   for (const f of [
     "../index.html",
@@ -39,6 +85,16 @@ test("edit policy rejects escapes, secrets, dependencies and build configuration
   const base = path.join(os.tmpdir(), "authorized-root");
   assert.equal(contained(base, base + "-outside"), false);
   assert.equal(contained(base, path.join(base, "source")), true);
+});
+
+test("unchanged model edits are rejected before candidate construction", async () => {
+  const run = createRun({ ...fixtureInput("pagination"), engine: "fixture" });
+  await prepare(run);
+  const change = fixtureChange("pagination");
+  await assert.rejects(
+    applyChanges(run, [{ ...change, replace: change.search }]),
+    /source unchanged/,
+  );
 });
 test("candidate edits are isolated and exact, and approvals invalidate after file mutation", async () => {
   const run = createRun({ ...fixtureInput("pagination"), engine: "fixture" });
