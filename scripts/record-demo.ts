@@ -24,7 +24,7 @@ const page = await context.newPage();
 const pause = () => page.waitForTimeout(1600);
 await page.goto(base);
 await page
-  .getByRole("heading", { name: "A clearer start to your day." })
+  .getByRole("heading", { name: "Maintenance overview." })
   .waitFor();
 await pause();
 await page
