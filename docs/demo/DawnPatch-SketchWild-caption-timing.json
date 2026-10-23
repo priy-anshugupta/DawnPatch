@@ -1,0 +1,26 @@
+{
+  "method": "ElevenLabs forced alignment of the final edited narration audio against its exact transcript",
+  "audioSource": "DawnPatch-SketchWild-1080p.mp4",
+  "spokenWords": 469,
+  "cues": 71,
+  "transcriptMatches": true,
+  "overlappingCues": 0,
+  "minCueSeconds": 1.1600000000000001,
+  "maxCueSeconds": 3.719999999999999,
+  "maxCharacters": 63,
+  "maxStartDifferenceFromAlignedSpeech": 0.04000000000000625,
+  "maxEndDifferenceFromAlignedSpeech": 0.12000000000000455,
+  "firstSpeechSeconds": 0.12,
+  "lastSpeechSeconds": 193.52,
+  "style": {
+    "font": "Arial",
+    "size": 26,
+    "backdropOpacity": 0.27,
+    "position": "bottom",
+    "marginPixels": 20
+  },
+  "audioReused": true,
+  "fullVideoDecode": "passed",
+  "identicalEncodedAudioHash": "0d7b740dceac4a089c4cadeafe09407b",
+  "embeddedCueCount": 71
+}

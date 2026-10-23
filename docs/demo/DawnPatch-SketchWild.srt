@@ -1,0 +1,283 @@
+1
+00:00:00,080 --> 00:00:01,240
+Meet DawnPatch.
+
+2
+00:00:01,640 --> 00:00:04,780
+A local repair workbench that turns a reported browser bug
+
+3
+00:00:04,880 --> 00:00:06,380
+into evidence you can review.
+
+4
+00:00:07,400 --> 00:00:09,840
+For this test, we are using Sketch Wild,
+
+5
+00:00:09,940 --> 00:00:11,940
+an outdoor sketchbook application.
+
+6
+00:00:12,460 --> 00:00:14,820
+The bug is a deliberately reversed comparison
+
+7
+00:00:14,920 --> 00:00:16,580
+in an isolated test copy.
+
+8
+00:00:17,100 --> 00:00:19,230
+Choosing a five minute budget incorrectly
+
+9
+00:00:19,240 --> 00:00:20,920
+leaves longer missions visible.
+
+10
+00:00:21,540 --> 00:00:23,940
+The original repository stays unchanged.
+
+11
+00:00:24,400 --> 00:00:26,460
+We will also check the twenty minute budget
+
+12
+00:00:26,500 --> 00:00:29,840
+and the location filter, so a partial fix cannot pass.
+
+13
+00:00:30,820 --> 00:00:34,240
+In Dawn Patch, I start a local repository investigation.
+
+14
+00:00:34,700 --> 00:00:36,980
+The report describes the behavior we need:
+
+15
+00:00:37,420 --> 00:00:39,620
+the selected time is a maximum budget,
+
+16
+00:00:39,780 --> 00:00:42,040
+and shorter missions must remain available.
+
+17
+00:00:42,660 --> 00:00:45,100
+This gives the repair agent a clear requirement,
+
+18
+00:00:45,300 --> 00:00:47,700
+rather than just saying that a screen is broken.
+
+19
+00:00:48,600 --> 00:00:51,980
+Next, I record the browser steps and the expected results.
+
+20
+00:00:52,580 --> 00:00:54,540
+These checks cover the five minute limit,
+
+21
+00:00:54,840 --> 00:00:56,800
+all six missions within twenty minutes,
+
+22
+00:00:57,060 --> 00:00:59,260
+and the four missions available in a courtyard.
+
+23
+00:00:59,800 --> 00:01:02,580
+The exact same steps will run against both copies.
+
+24
+00:01:03,180 --> 00:01:05,060
+The selected engine is local Gemma,
+
+25
+00:01:05,160 --> 00:01:08,090
+coordinated through Mastra, with source edits kept
+
+26
+00:01:08,100 --> 00:01:09,680
+in an isolated workspace.
+
+27
+00:01:10,540 --> 00:01:13,320
+Local Gemma attempted the repair through Mastra.
+
+28
+00:01:13,740 --> 00:01:16,220
+Its proposals repeated the existing code,
+
+29
+00:01:16,340 --> 00:01:17,980
+so Dawn Patch rejected them.
+
+30
+00:01:18,260 --> 00:01:20,820
+The model did not solve this case autonomously.
+
+31
+00:01:21,440 --> 00:01:23,460
+I supplied a reviewed correction next,
+
+32
+00:01:23,640 --> 00:01:26,060
+and the workbench verified it independently.
+
+33
+00:01:26,580 --> 00:01:29,600
+The long local processing wait is removed from this edit.
+
+34
+00:01:30,600 --> 00:01:32,820
+Here is the developer assisted correction.
+
+35
+00:01:33,240 --> 00:01:34,920
+The time budget is a maximum,
+
+36
+00:01:35,060 --> 00:01:37,330
+so the duration comparison must include
+
+37
+00:01:37,340 --> 00:01:38,900
+missions at or below it.
+
+38
+00:01:39,360 --> 00:01:42,690
+Dawn Patch labels the correction clearly and applies it only
+
+39
+00:01:42,700 --> 00:01:44,120
+to an isolated copy.
+
+40
+00:01:45,080 --> 00:01:48,000
+The corrected candidate has now passed verification.
+
+41
+00:01:48,480 --> 00:01:50,480
+This is a developer assisted result,
+
+42
+00:01:50,620 --> 00:01:52,520
+with independent browser evidence.
+
+43
+00:01:53,160 --> 00:01:56,300
+The original repository has not been changed or published.
+
+44
+00:01:57,200 --> 00:01:59,410
+On the corrected website, five minutes now
+
+45
+00:01:59,420 --> 00:02:00,940
+shows exactly one mission.
+
+46
+00:02:01,500 --> 00:02:02,930
+Twenty minutes restores all
+
+47
+00:02:02,940 --> 00:02:04,940
+six, including shorter tasks.
+
+48
+00:02:05,600 --> 00:02:08,319
+Choosing the courtyard keeps four eligible missions.
+
+49
+00:02:08,800 --> 00:02:12,120
+These checks confirm that the fix preserves the location filter
+
+50
+00:02:12,220 --> 00:02:13,680
+as well as the time boundary.
+
+51
+00:02:14,660 --> 00:02:18,110
+Back in Dawn Patch, the evidence view preserves the baseline
+
+52
+00:02:18,120 --> 00:02:20,820
+and candidate captures from real Chromium runs.
+
+53
+00:02:21,320 --> 00:02:24,100
+The comparison slider helps review what changed.
+
+54
+00:02:24,560 --> 00:02:27,760
+The pass or fail result comes from the recorded assertions,
+
+55
+00:02:28,040 --> 00:02:30,080
+rather than from how a screenshot looks.
+
+56
+00:02:31,080 --> 00:02:33,210
+The patch is small: one comparison
+
+57
+00:02:33,220 --> 00:02:34,740
+changes in the mission filter.
+
+58
+00:02:35,200 --> 00:02:37,830
+Dependencies, credentials, mission content,
+
+59
+00:02:37,840 --> 00:02:40,040
+and configuration remain untouched.
+
+60
+00:02:40,520 --> 00:02:43,120
+The source diff is available for review and export.
+
+61
+00:02:44,100 --> 00:02:46,280
+The checks confirm a failing baseline,
+
+62
+00:02:46,440 --> 00:02:50,160
+a successful isolated build, and a passing candidate replay.
+
+63
+00:02:50,720 --> 00:02:52,730
+The same eight recorded steps ran
+
+64
+00:02:52,740 --> 00:02:54,380
+before and after the change.
+
+65
+00:02:54,940 --> 00:02:58,260
+Broader application behavior still needs its own tests.
+
+66
+00:02:59,300 --> 00:03:01,340
+That is Dawn Patch: reproduce,
+
+67
+00:03:01,440 --> 00:03:03,500
+repair, verify, and review.
+
+68
+00:03:04,100 --> 00:03:06,980
+This demonstration shows a real Sketch Wild test
+
+69
+00:03:07,060 --> 00:03:09,600
+with a clearly labeled developer assisted correction,
+
+70
+00:03:10,000 --> 00:03:12,210
+rather than claiming an autonomous fix that
+
+71
+00:03:12,220 --> 00:03:13,640
+the model did not produce.

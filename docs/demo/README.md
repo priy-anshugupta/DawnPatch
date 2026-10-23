@@ -1,3 +1,9 @@
+# Latest demonstration
+
+[Watch the SketchWild demonstration](https://youtu.be/6MC6XOIzUgU) or [download the synchronized 1080p video](DawnPatch-SketchWild-1080p-synced.mp4). Website-only capture with English narration and captions. The verified repair is explicitly developer-assisted; see [video notes](VIDEO_NOTES.md) for the test scope and actual outcomes.
+
+---
+
 # DawnPatch local demonstration
 
 Recorded from the running local app on 2026-10-22T09:09:13.792Z.
