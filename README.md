@@ -59,14 +59,20 @@ If an action, build, provider, or model fails, DawnPatch records the error rathe
 
 ## Demo and screenshots
 
-- [Watch/download the local demo recording](docs/demo/dawnpatch-local-demo.webm).
-- [Recording provenance and engine used](docs/demo/README.md).
-- [Inspect the before/after evidence screen](docs/screenshots/evidence-comparison.png).
-- [Measured build status and remaining validation](docs/BUILD_STATUS.md).
+[Watch the narrated SketchWild demonstration on YouTube](https://youtu.be/6MC6XOIzUgU)
 
-The included recording demonstrates actual browser capture and verification using an explicitly labeled **reference repair**. It predates the latest desktop styling and does not claim successful model-generated repair. The README screenshot shows the newer console UI.
+- [Download the synchronized 1080p video](docs/demo/DawnPatch-SketchWild-1080p-synced.mp4).
+- [Read the video notes and recording scope](docs/demo/VIDEO_NOTES.md).
+- [Inspect the complete SketchWild test report](docs/SKETCHWILD_TEST_REPORT.md).
+- [Review browser evidence](docs/screenshots/evidence-comparison.png).
+- [Read measured build status](docs/BUILD_STATUS.md).
+- [Read the challenge submission](post.md).
 
-> **Current repair-quality limitation:** the recorded `gemma3:1b` development attempts did not produce verified fixes. The pipeline rejected their invalid output. A more capable Gemma model still needs evaluation; the three passing reference fixtures establish browser-pipeline behavior, not model accuracy. See [evaluation evidence](docs/evidence/local-evaluation.json).
+The latest recording demonstrates a deliberately introduced mission-filter regression in an isolated SketchWild checkout. Gemma 3:4b did not independently produce the successful correction. A developer submitted the exact source change, and DawnPatch built the candidate and passed the same eight browser steps, including the twenty-minute and location-filter regression checks. The UI and narration retain that provenance. A healthy upstream control passed without generating a patch.
+
+> **Repair-quality limitation:** the observed Gemma attempts do not establish autonomous repair accuracy. Candidate verification covers the configured assertions and build. See the [test report](docs/SKETCHWILD_TEST_REPORT.md) for rejected proposals, the successful developer-assisted result, and validation scope.
+
+The [earlier reference-fixture recording](docs/demo/dawnpatch-local-demo.webm) is historical and uses a known repair without model inference.
 
 ## Start
 
@@ -85,7 +91,7 @@ npm start
 
 Choose the installed model in Settings. If using a different Gemma tag, set `GEMMA_MODEL` in `.env` before the first start. Model selection saved in the workbench persists in SQLite and takes precedence over the startup environment value.
 
-On macOS/Linux, replace `Copy-Item .env.example .env` with `cp .env.example .env`. Set `GEMMA_MODEL=gemma3:4b` in `.env` to match the model downloaded above. Start Ollama before starting a model investigation. The 4B model is a candidate to evaluate, not a proven repair-quality result in this repository.
+On macOS/Linux, replace `Copy-Item .env.example .env` with `cp .env.example .env`. Set `GEMMA_MODEL=gemma3:4b` in `.env` to match the model downloaded above. Start Ollama before starting a model investigation. The 4B model was exercised in the recorded test; the successful candidate required a developer-assisted correction.
 
 Open **http://127.0.0.1:4310**. For frontend development, `npm run dev` runs Vite on port 5173 and the API on 4310. A separate preview server binds to 4311 so untrusted preview scripts do not share the control API's origin.
 
@@ -109,11 +115,11 @@ Set `SOURCE_ROOTS` to directories whose repositories you authorize the app to re
 SOURCE_ROOTS=C:\Projects;D:\OpenSource
 ```
 
-Use **Investigate issue → Local repository**. Supply a clean Git checkout, select Static HTML, React/Vite, or Next.js, and define typed steps using `click`, `fill`, `select`, `text`, `visible`, `hidden`, and `count`. Include at least one assertion. Repository roots are validated using resolved paths; symlinks and sensitive/generated directories are excluded from copying. Source input is bounded to 1,500 files / 20 MB and model context to 25 source files / roughly 40,000 characters.
+Use **Investigate issue → Local repository**. Supply a clean Git checkout, select Static HTML, React/Vite, or Next.js, and define typed steps using `click`, `fill`, `select`, `text`, `visible`, `hidden`, and `count`. Include at least one assertion. Repository roots are validated using resolved paths; symlinks and sensitive/generated directories are excluded from copying. Source input is bounded to 1,500 files / 20 MB and model context to at most 25 source files / 12,000 characters by default. Use `SOURCE_CONTEXT_CHARS` to reduce the context budget and `GEMMA_TIMEOUT_MS` to configure the inference timeout on CPU-based laptops.
 
-For Docker recipes, the app builds in an isolated source copy with capped memory, CPUs, PIDs, dropped capabilities, and no injected host credentials. Vite requires `npm ci`, `npm run build`, and a `preview` script. Next.js requires a lockfile, `npm run build`, and the installed Next CLI. The build container exposes a temporary loopback preview and is removed afterwards. Use repositories you trust; this is a local developer tool, not a hardened public multi-tenant execution service. Dependency installation requires registry access.
+For Docker recipes, the app builds in an isolated source copy with capped memory, CPUs, PIDs, dropped capabilities, and no injected host credentials. Vite requires a lockfile, `npm ci`, `npm run build`, and its installed preview CLI; a package script named `preview` is not required. Next.js requires a lockfile, `npm run build`, and the installed Next CLI. The build container exposes a temporary loopback preview and is removed afterwards. Use repositories you trust; this is a local developer tool, not a hardened public multi-tenant execution service. Dependency installation requires registry access.
 
-The model can edit at most five exact matching snippets in existing source files. Dependency manifests, VCS metadata, credentials, generated files, and build configuration cannot be changed. Source edits never touch the original checkout. Invalid edits receive at most one correction request. Original and rejected-run evidence are retained.
+The model can edit at most five exact matching snippets in existing source files. Dependency manifests, VCS metadata, credentials, generated files, and build configuration cannot be changed. Source edits never touch the original checkout. Invalid edits receive at most one correction request. Original and rejected-run evidence are retained. If a model proposal fails, the developer-correction form accepts an exact reviewed edit and replays the saved checks. These runs are permanently labeled developer-assisted.
 
 ## Durable execution and scheduling
 
@@ -179,7 +185,7 @@ npm test
 npm run test:e2e
 ```
 
-Core tests cover path/edit restrictions, isolated edits, stale approvals, and schedule deduplication/timezones. Browser tests exercise the three known reference repairs, actual screenshot/trace downloads, diff export, mutation guards, desktop review, comparison, schedules, and mobile layout. They do not pretend the model generated the reference fixes.
+Core and transport tests cover path/edit restrictions, unchanged-edit rejection, filename grounding, relevant source selection, isolated edits, stale approvals, cancellation, and schedule deduplication/timezones. Browser tests exercise the three known reference repairs, actual screenshot/trace downloads, diff export, mutation guards, desktop review, comparison, schedules, and settings on desktop. They do not pretend the model generated the reference fixes.
 
 GitHub Actions configuration is in `.github/workflows/verify.yml`. It builds, runs core/browser tests, and uploads evidence. It must actually run in your repository before being cited as category evidence. No Copilot usage or Entire session is fabricated by this project.
 
@@ -232,7 +238,7 @@ Use a focused branch, explain the behavioral problem, and include the relevant c
 
 DawnPatch uses open-source libraries and local open-weight inference. Dependency code, fonts, and models retain their respective licenses and terms. The bundled Fieldnotes application is an original test fixture. The instrument-style interface takes visual inspiration from a user-supplied monochrome transfer-console reference. Development assistance was provided by Codex; no Copilot or Entire session is claimed without actual evidence.
 
-Built for the [Hacktoberfest Week 3 Open-Source AI Challenge](https://dev.to/challenges/hacktoberfest-week3-2026-10-19). Seven partner categories are **targets**, not automatically earned integrations; see [TRACK_SETUP.md](TRACK_SETUP.md).
+Built for the [Hacktoberfest Week 3 Open-Source AI Challenge](https://dev.to/challenges/hacktoberfest-week3-2026-10-19). Eight partner-category entries are documented in the [submission](post.md); the [complete track audit](docs/submission/TRACK_AUDIT.md) distinguishes actual use from remaining session and tracing evidence.
 
 ## License
 
