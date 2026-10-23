@@ -1,5 +1,7 @@
 # DawnPatch — verified build status
 
+Latest desktop testing (October 23, 2026): build and typecheck passed, eleven core/transport tests passed, seven browser tests passed, runtime dependency audit reported zero vulnerabilities, and Sketchwild built with its 17 existing tests passing in Docker. The deliberate mission-filter regression was reproduced in Chromium. See [the detailed Sketchwild test report](SKETCHWILD_TEST_REPORT.md) for the measured model-repair outcome and current integration limits. Earlier results below are historical.
+
 Date: October 22, 2026. This records observed results, not a claim that all partner categories have been earned.
 
 ## Implemented and locally exercised
@@ -24,13 +26,13 @@ Date: October 22, 2026. This records observed results, not a claim that all part
 | `npx tsx scripts/temporal-recovery.ts` | Passed: worker termination and restart on the same case |
 | `npm audit --omit=dev --audit-level=high` | Zero runtime dependency vulnerabilities reported |
 
-The browser suite covers all three reference repairs, actual screenshot/trace retrieval, patch export, mutation guards, review, screenshot comparison, schedules and 390px layout. It does not grade model repair accuracy.
+The browser suite covers all three reference repairs, actual screenshot/trace retrieval, patch export, mutation guards, review, screenshot comparison, schedules and settings. The current suite is desktop-only, as requested. It does not grade model repair accuracy.
 
 ## Actual model outcomes
 
 Four development attempts with **gemma3:1b** completed inference but did not yield a verified fix: proposed edits failed exact-source validation or structured output did not validate. The app retained failures and did not mark them fixed. These are development samples, not a representative benchmark. The evaluation JSON records actual runs, including those failures.
 
-The **gemma3:4b** download was attempted but its network request timed out before installation completed. Its performance has not been tested. A more capable installed Gemma model needs to be selected and evaluated on real cases before describing model repair quality as ready. Resume the download with `ollama pull gemma3:4b`, or choose another suitable Gemma tag that fits the machine.
+On October 22, the **gemma3:4b** download timed out. On October 23, its installation was confirmed and a real Sketchwild repair was exercised; consult the current test report above for the outcome. One controlled case is not a representative repair-quality benchmark.
 
 ## Implemented paths needing real environment/account validation
 
