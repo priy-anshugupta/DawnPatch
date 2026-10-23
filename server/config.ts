@@ -12,6 +12,8 @@ export const config = {
     "",
   ),
   model: process.env.GEMMA_MODEL || "gemma3:1b",
+  inferenceTimeout: Number(process.env.GEMMA_TIMEOUT_MS || 600000),
+  sourceContextChars: Number(process.env.SOURCE_CONTEXT_CHARS || 12000),
   engine: process.env.WORKFLOW_ENGINE || "local",
   temporal: process.env.TEMPORAL_ADDRESS || "127.0.0.1:7233",
   namespace: process.env.TEMPORAL_NAMESPACE || "default",
