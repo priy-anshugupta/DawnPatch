@@ -22,6 +22,7 @@ import {
   enqueue,
   cancelRun,
   retryRun,
+  reviewedCorrection,
   startLocalQueue,
   related,
   candidateFiles,
@@ -83,6 +84,9 @@ app.get("/api/fixtures", (_req, res) =>
   ),
 );
 app.get("/api/runs", (_req, res) => res.json(allRuns()));
+app.post("/api/runs/:id/correction", async (req, res) =>
+  res.status(202).json(await reviewedCorrection(req.params.id, req.body)),
+);
 app.post("/api/runs", async (req, res) =>
   res.status(202).json(await enqueue(createRunSchema.parse(req.body))),
 );
@@ -244,12 +248,10 @@ app.use(
       status?: number;
       issues?: unknown;
     };
-    res
-      .status(error.status || 400)
-      .json({
-        error: error.message || "Request failed",
-        ...(error.issues ? { issues: error.issues } : {}),
-      });
+    res.status(error.status || 400).json({
+      error: error.message || "Request failed",
+      ...(error.issues ? { issues: error.issues } : {}),
+    });
   },
 );
 // Untrusted previews use a different origin from the control API.
