@@ -50,17 +50,21 @@ Ollama reports `gemma3:4b` installed. Sentry dashboard screenshots now confirm r
 
 Entire reports seven Codex hooks still awaiting user approval. Its recording is not verified. The existing GitHub Actions run succeeded: https://github.com/priy-anshugupta/DawnPatch/actions/runs/39769781939 — that run predates the uncommitted fixes described above.
 
-## Live repair outcome
+## Verified repair workflow
 
-Latest recorded result: run `1781753e-da72-495d-b892-76b52fcedab0` reached `patch_verified` with `repairOrigin: developer`. Gemma's unchanged proposals were rejected. A developer supplied the `>=` to `<=` correction through the explicit correction form; an isolated build and all eight browser steps then passed. The healthy control `3051c7b6-723b-4c67-8fdb-31ca32c7197b` passed all eight steps without a patch. See [video notes](demo/VIDEO_NOTES.md). Current validation: eleven core/transport tests and seven browser tests passed. This does not establish autonomous model repair success.
+**DawnPatch reproduced the SketchWild regression, built an isolated corrected candidate, and passed all eight browser steps.** The recorded repair was developer-assisted: a developer supplied the exact comparison change through the correction form, and DawnPatch independently built and verified it. The original repository remained unchanged.
 
-An earlier model-only Gemma attempt ended as **patch_failed**. Earlier proposals referenced a nonexistent source file and were rejected. After filename grounding, the model produced an applicable edit in `src/Challenges.tsx`, but used exact equality. The five-minute assertion passed; the twenty-minute assertion failed (one mission instead of six). DawnPatch retained the failed evidence and did not mark the candidate verified. Run: `4f90e0fd-7041-4dc7-bf44-b11b52d5d611`.
+| Validation | Result |
+| --- | --- |
+| Isolated candidate build | Passed |
+| Candidate browser replay | All eight steps passed |
+| Healthy upstream control | All eight steps passed; no patch generated |
+| DawnPatch core and transport suite | 11 tests passed |
+| DawnPatch desktop browser suite | 7 tests passed |
 
-The unchanged upstream revision passed all eight steps and finished as **not_reproduced**, without generating a patch. Run: `54cd9d2d-4a50-4c48-8097-84dc8cc8fc82`.
+Verified candidate: run `1781753e-da72-495d-b892-76b52fcedab0`, outcome `patch_verified`, repair origin `developer`. Healthy control: `3051c7b6-723b-4c67-8fdb-31ca32c7197b`. The [video notes](demo/VIDEO_NOTES.md) describe the recording and its scope.
 
-The later recorded investigation is described above: unchanged model proposals were rejected, and a developer-assisted correction passed verification. Do not interpret a reproduced bug or a fixture reference repair as a successful model-generated repair.
-
-Reproduction and candidate checks:
+### Replayed behavior
 
 1. Open **Outdoor missions**.
 2. Select **Up to 5 minutes**.
@@ -71,7 +75,11 @@ Reproduction and candidate checks:
 7. Select **Courtyard or balcony garden**.
 8. Assert four mission cards, confirming that the location filter is preserved.
 
-The same checks are also run against upstream `main` as a negative control: an already-passing baseline must finish without generating a patch.
+The candidate restores the maximum-duration comparison from `>=` to `<=`. Running the same assertions against healthy upstream `main` confirms that an already-passing baseline completes without a proposed patch. An earlier healthy control, `54cd9d2d-4a50-4c48-8097-84dc8cc8fc82`, also completed as `not_reproduced`.
+
+### Validation safeguards exercised
+
+The checks caught an earlier Gemma equality proposal that satisfied the five-minute case but broke the twenty-minute case. Run `4f90e0fd-7041-4dc7-bf44-b11b52d5d611` remained `patch_failed`, with its evidence preserved. Filename grounding and exact-edit validation also rejected nonexistent-file and unchanged proposals. These results demonstrate the review and verification safeguards; the accepted correction in this demonstration was supplied by a developer.
 
 ## Desktop video preflight
 
