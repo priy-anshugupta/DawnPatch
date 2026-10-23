@@ -1,6 +1,21 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs/promises";
 const headers = { "X-DawnPatch": "local-workbench" };
+
+test("a temporary API outage clears its message after polling recovers", async ({
+  page,
+}) => {
+  let disconnected = true;
+  await page.route("**/api/runs", (route) =>
+    disconnected ? route.abort("failed") : route.continue(),
+  );
+  await page.goto("/");
+  await expect(page.getByRole("alert")).toContainText(
+    "local server is unavailable",
+  );
+  disconnected = false;
+  await expect(page.getByRole("alert")).toHaveCount(0, { timeout: 10000 });
+});
 test("loopback API rejects cross-origin mutations and missing request guards", async ({
   request,
 }) => {
@@ -61,7 +76,55 @@ for (const fixture of ["pagination", "empty", "form"])
       ).status(),
     ).toBe(200);
   });
-test("desktop review, evidence compare, schedule and responsive layout", async ({
+test("reviewed corrections preserve provenance and must pass independent replay", async ({
+  request,
+}) => {
+  const cases = await (await request.get("/api/fixtures")).json();
+  const input = {
+    ...cases.find((item: any) => item.fixture === "pagination"),
+    engine: "fixture",
+  };
+  const created = await (
+    await request.post("/api/runs", { headers, data: input })
+  ).json();
+  let run: any;
+  await expect
+    .poll(
+      async () => {
+        run = await (await request.get(`/api/runs/${created.id}`)).json();
+        return run.status;
+      },
+      { timeout: 70000 },
+    )
+    .toBe("awaiting_review");
+  const correction = run.changes[0];
+  const unchanged = await request.post(`/api/runs/${run.id}/correction`, {
+    headers,
+    data: { ...correction, replace: correction.search },
+  });
+  expect(unchanged.status()).toBe(400);
+  const revised = await request.post(`/api/runs/${run.id}/correction`, {
+    headers,
+    data: correction,
+  });
+  expect(revised.status()).toBe(202);
+  expect((await revised.json()).repairOrigin).toBe("developer");
+  await expect
+    .poll(
+      async () => {
+        run = await (await request.get(`/api/runs/${created.id}`)).json();
+        return run.status;
+      },
+      { timeout: 70000 },
+    )
+    .toBe("awaiting_review");
+  expect(run.candidate.passed).toBe(true);
+  expect(run.diagnosis.limitations.join(" ")).toContain(
+    "not an autonomous Gemma repair",
+  );
+});
+
+test("desktop review, evidence compare, schedule and connections", async ({
   page,
   request,
 }) => {
@@ -70,6 +133,17 @@ test("desktop review, evidence compare, schedule and responsive layout", async (
   await expect(
     page.getByRole("heading", { name: "Maintenance overview." }),
   ).toBeVisible();
+  expect(
+    await page
+      .locator(".nav-item")
+      .first()
+      .evaluate((element) => parseFloat(getComputedStyle(element).fontSize)),
+  ).toBeGreaterThanOrEqual(14);
+  expect(
+    await page
+      .getByRole("button", { name: "Investigate issue", exact: true })
+      .evaluate((element) => parseFloat(getComputedStyle(element).fontSize)),
+  ).toBeGreaterThanOrEqual(14);
   await fs.mkdir("docs/screenshots", { recursive: true });
   await page.screenshot({
     path: "docs/screenshots/workbench-desktop.png",
@@ -108,18 +182,11 @@ test("desktop review, evidence compare, schedule and responsive layout", async (
   const schedules = await (await request.get("/api/schedules")).json();
   for (const s of schedules.filter((s: any) => s.name === "E2E schedule"))
     await request.delete(`/api/schedules/${s.id}`, { headers });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.reload();
-  await page.screenshot({
-    path: "docs/screenshots/workbench-mobile.png",
-    fullPage: true,
-  });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-  await page.getByRole("button", { name: "Toggle navigation" }).click();
   await page
     .getByRole("button", { name: "Settings & connections", exact: true })
     .click();
