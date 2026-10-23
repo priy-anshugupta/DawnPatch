@@ -7,3 +7,7 @@ dist/
 test-results/
 playwright-report/
 *.log
+
+# Local recording hook state and generated download bundle
+/.codex/
+/docs/DawnPatch-DEV-Submission.zip
