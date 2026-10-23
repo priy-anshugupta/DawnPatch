@@ -337,6 +337,9 @@ export default function App() {
   const [runs, setRuns] = useState<Run[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
   const [error, setError] = useState("");
+  const [connectionErrors, setConnectionErrors] = useState<
+    Record<string, string>
+  >({});
   const [toast, setToast] = useState("");
   const [creating, setCreating] = useState(false);
   const [template, setTemplate] = useState<RunInput | null>(null);
@@ -344,15 +347,23 @@ export default function App() {
   const refresh = async () => {
     try {
       setRuns(await api("/runs"));
+      setConnectionErrors((previous) => ({ ...previous, runs: "" }));
     } catch (e) {
-      setError((e as Error).message);
+      setConnectionErrors((previous) => ({
+        ...previous,
+        runs: (e as Error).message,
+      }));
     }
   };
   const check = async () => {
     try {
       setHealth(await api("/health"));
+      setConnectionErrors((previous) => ({ ...previous, health: "" }));
     } catch (e) {
-      setError((e as Error).message);
+      setConnectionErrors((previous) => ({
+        ...previous,
+        health: (e as Error).message,
+      }));
     }
   };
   useEffect(() => {
@@ -480,6 +491,15 @@ export default function App() {
           </button>
         </header>
         <main>
+          {Object.values(connectionErrors).some(Boolean) && (
+            <div className="error-banner" role="alert">
+              <AlertTriangle size={17} />
+              <span>
+                {Object.values(connectionErrors).find(Boolean)} Reconnecting
+                automatically.
+              </span>
+            </div>
+          )}
           {error && (
             <div className="error-banner" role="alert">
               <AlertTriangle size={17} />
@@ -789,6 +809,9 @@ function Queue({
                             {r.id.slice(0, 8)}
                             {r.input.engine === "fixture" && (
                               <em>Reference repair</em>
+                            )}
+                            {r.repairOrigin === "developer" && (
+                              <em>Developer-assisted</em>
                             )}
                           </small>
                         </span>
@@ -1240,9 +1263,9 @@ function NewRun({
                 Research documentation with SerpApi (requires your API key)
               </label>
               <small>
-                Bounded to five patch edits, one documentation query, and a
-                four-minute model call. Repository build timeout: five minutes
-                per preview.
+                Bounded to five patch edits and one documentation query.
+                Repository startup timeout: five minutes per preview. The local
+                model timeout is configurable.
               </small>
             </div>
           )}
@@ -1291,6 +1314,12 @@ function CaseDetail({
   >([]);
   const [diff, setDiff] = useState("");
   const [approval, setApproval] = useState(false);
+  const [correcting, setCorrecting] = useState(false);
+  const [correction, setCorrection] = useState({
+    file: "",
+    search: "",
+    replace: "",
+  });
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     api(`/runs/${r.id}/events`)
@@ -1331,6 +1360,86 @@ function CaseDetail({
   const stale = last && Date.now() - Date.parse(last.at) > 30000;
   return (
     <>
+      {correcting && (
+        <Dialog
+          title="Developer-assisted correction"
+          onClose={() => setCorrecting(false)}
+          wide
+        >
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setBusy(true);
+              try {
+                await api(`/runs/${r.id}/correction`, "POST", correction);
+                setCorrecting(false);
+                notify(
+                  "Developer-assisted correction queued for browser verification.",
+                );
+              } catch (error) {
+                onError((error as Error).message);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            <div className="modal-body">
+              <p>
+                This correction will be labeled as developer-assisted. DawnPatch
+                will apply it to an isolated copy and replay the original
+                browser checks.
+              </p>
+              <label>
+                Source filename
+                <input
+                  aria-label="Source filename"
+                  required
+                  value={correction.file}
+                  onChange={(e) =>
+                    setCorrection({ ...correction, file: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Exact old code
+                <textarea
+                  aria-label="Exact old code"
+                  required
+                  rows={4}
+                  value={correction.search}
+                  onChange={(e) =>
+                    setCorrection({ ...correction, search: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                Corrected code
+                <textarea
+                  aria-label="Corrected code"
+                  required
+                  rows={4}
+                  value={correction.replace}
+                  onChange={(e) =>
+                    setCorrection({ ...correction, replace: e.target.value })
+                  }
+                />
+              </label>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn secondary"
+                onClick={() => setCorrecting(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn primary" disabled={busy}>
+                Verify reviewed correction
+              </button>
+            </div>
+          </form>
+        </Dialog>
+      )}
       <button className="back-link" onClick={onBack}>
         <ArrowLeft size={15} />
         Back to workbench
@@ -1393,6 +1502,34 @@ function CaseDetail({
           </span>
         </div>
       )}
+      {r.repairOrigin === "developer" && (
+        <div className="info-banner">
+          <Code2 size={17} />
+          <span>
+            <strong>Developer-assisted correction.</strong> Source change
+            supplied by a developer; browser verification is independent. This
+            is not an autonomous Gemma repair.
+          </span>
+        </div>
+      )}
+      {!active &&
+        !r.approval &&
+        !r.publication &&
+        r.baseline &&
+        !r.baseline.passed &&
+        (r.status === "failed" || r.outcome === "patch_failed") && (
+          <button
+            className="btn secondary"
+            onClick={() => {
+              setCorrection(
+                r.changes[0] || { file: "", search: "", replace: "" },
+              );
+              setCorrecting(true);
+            }}
+          >
+            Revise with reviewed correction
+          </button>
+        )}
       {r.error && (
         <div className="error-banner" role="alert">
           <AlertTriangle size={18} />
@@ -1448,6 +1585,12 @@ function CaseDetail({
           <p aria-live="polite">
             {last?.message || "Waiting for the first worker event."}
           </p>
+          {r.stage === "analyzing" && r.input.engine === "gemma" && (
+            <p className="subtle">
+              Gemma is running locally. CPU analysis can take several minutes;
+              this page updates automatically. You can cancel at any time.
+            </p>
+          )}
           {stale && (
             <small className="warning-text">
               No new event for{" "}
