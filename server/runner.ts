@@ -13,7 +13,7 @@ import { diagnose } from "./agent.ts";
 import { fixtureChange } from "./fixtures.ts";
 import { searchDocs, traced } from "./integrations.ts";
 import { config } from "./config.ts";
-import type { RunInput } from "../shared/types.ts";
+import type { RunInput, Change } from "../shared/types.ts";
 let busy = false;
 const inFlight = new Set<string>();
 function active(id: string) {
@@ -294,6 +294,60 @@ export async function retryRun(id: string) {
     id,
     "queued",
     "Resuming from persisted evidence and stage checkpoints.",
+  );
+  return getRun(id);
+}
+export async function reviewedCorrection(id: string, change: Change) {
+  const run = getRun(id);
+  if (config.engine !== "local")
+    throw new Error(
+      "Reviewed corrections currently require the local workflow engine.",
+    );
+  if (inFlight.has(id) || ["queued", "running"].includes(run.status))
+    throw new Error("Wait for the current investigation to finish.");
+  if (run.publication || run.approval)
+    throw new Error(
+      "An accepted or published candidate cannot be revised here.",
+    );
+  if (!run.baseline || run.baseline.passed || !run.baseSha)
+    throw new Error("A reproduced failing baseline is required.");
+  const correction = {
+    file: change?.file,
+    search: change?.search,
+    replace: change?.replace,
+  };
+  if (Object.values(correction).some((value) => typeof value !== "string"))
+    throw new Error(
+      "Provide a source filename, exact old code and corrected code.",
+    );
+  // Validate with the same isolation and exact-match rules as model proposals.
+  await applyChanges(run, [correction]);
+  patchRun(id, {
+    status: "queued",
+    stage: "queued",
+    outcome: "pending",
+    error: null,
+    repairOrigin: "developer",
+    changes: [correction],
+    candidateHash: null,
+    candidate: null,
+    checks: [],
+    approval: null,
+    diagnosis: {
+      summary:
+        "Developer-assisted correction submitted for independent browser verification.",
+      hypothesis:
+        "The developer supplied the exact source change below; the original repository is unchanged.",
+      changes: [correction],
+      limitations: [
+        "This candidate was supplied by a developer after model proposals were rejected. It is not an autonomous Gemma repair. Verification covers the recorded browser assertions.",
+      ],
+    },
+  });
+  event(
+    id,
+    "queued",
+    "Developer-assisted correction received. Replaying the saved assertions independently; this is not a model-generated repair.",
   );
   return getRun(id);
 }

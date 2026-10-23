@@ -91,6 +91,7 @@ export interface Diagnosis {
   limitations: string[];
 }
 export interface Run {
+  repairOrigin?: "developer";
   id: string;
   input: RunInput;
   status: RunStatus;
