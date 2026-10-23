@@ -1,0 +1,5 @@
+Source code: https://github.com/priy-anshugupta/DawnPatch
+
+This demo shows a developer-assisted correction with automated browser verification. DawnPatch preserves the failing baseline, source diff, and results so the next review starts with evidence.
+
+What would you automate first: reproducing a bug, collecting evidence, or replaying regression checks?

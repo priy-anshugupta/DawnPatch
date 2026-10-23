@@ -1,0 +1,1 @@
+DawnPatch, local AI, Gemma, Gemma 3, Gemma 3 4b, Ollama, Mastra, Playwright, browser testing, bug reproduction, bug verification, web development, developer tools, TypeScript, React, open source, open weight models, AI agent, human in the loop, software testing, regression testing, local LLM, Hacktoberfest, Hacktoberfest 2026, SketchWild, ElevenLabs, Temporal

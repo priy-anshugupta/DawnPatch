@@ -1,0 +1,11 @@
+00:00 Meet DawnPatch and the SketchWild bug
+00:31 Set up a local repository investigation
+00:49 Define browser steps and assertions
+01:11 Local Gemma and Mastra analysis
+01:31 Submit a reviewed correction
+01:45 Review the verified candidate
+01:57 Test the corrected SketchWild website
+02:15 Compare browser evidence
+02:31 Inspect the source diff
+02:44 Review verification checks
+02:59 Results and takeaways
