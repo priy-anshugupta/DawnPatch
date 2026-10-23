@@ -3,7 +3,7 @@
   color-scheme: dark;
   --console-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
   --line: #292929;
-  --muted: #939393;
+  --muted: #b2b2b2;
   background: #0c0c0c;
 }
 ::selection {
@@ -30,9 +30,9 @@
 .eyebrow {
   font-family: var(--console-mono);
   font-weight: 400;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.6px;
-  color: #888;
+  color: #b2b2ad;
 }
 .workspace-switch {
   background: #141414;
@@ -50,7 +50,7 @@
 }
 .nav-item {
   position: relative;
-  font-size: 12px;
+  font-size: 15px;
   border-radius: 2px;
   padding-top: 14px;
   padding-bottom: 14px;
@@ -86,11 +86,11 @@
   background: #0c0c0c;
 }
 .breadcrumb {
-  font-size: 11px;
+  font-size: 14px;
 }
 .model-status {
   font-family: var(--console-mono);
-  font-size: 10px;
+  font-size: 12px;
 }
 .local-pill {
   border: 1px solid #353535;
@@ -114,7 +114,7 @@ main {
 }
 .page-heading p {
   color: #999;
-  font-size: 12px;
+  font-size: 15px;
   letter-spacing: 0.2px;
 }
 .page-heading .eyebrow {
@@ -123,7 +123,7 @@ main {
 .btn {
   border-radius: 2px;
   min-height: 39px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   box-shadow: none;
   transition:
@@ -160,7 +160,7 @@ main {
 .operations-grid::before,
 .operations-grid::after {
   content: "+";
-  font: 12px var(--console-mono);
+  font: 15px var(--console-mono);
   color: #777;
   position: absolute;
   background: #0c0c0c;
@@ -189,7 +189,7 @@ main {
   border-right: 1px solid var(--line);
 }
 .instrument-label {
-  font: 10px var(--console-mono);
+  font: 12px var(--console-mono);
   letter-spacing: 0.6px;
   color: #bcbcb5;
 }
@@ -197,8 +197,9 @@ main {
   display: flex;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
   margin-top: auto;
-  font: 9px var(--console-mono);
+  font: 12px var(--console-mono);
   color: #8c8c87;
   line-height: 1.6;
 }
@@ -246,7 +247,7 @@ main {
 .radial-number small {
   display: block;
   color: #96968f;
-  font-size: 7px;
+  font-size: 12px;
   letter-spacing: 1px;
   margin-top: 7px;
 }
@@ -267,7 +268,7 @@ main {
 .meter-scale {
   display: flex;
   justify-content: space-between;
-  font: 9px var(--console-mono);
+  font: 12px var(--console-mono);
   color: #a0a098;
   margin: 10px 0 24px;
 }
@@ -291,19 +292,19 @@ main {
   letter-spacing: -2px;
 }
 .instrument-value small {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.6px;
   color: #a0a098;
 }
 .instrument-note {
-  font: 8px var(--console-mono);
+  font: 12px var(--console-mono);
   color: #85857e;
   margin-top: auto;
   padding-top: 16px;
   letter-spacing: 0.3px;
 }
 .workload-total {
-  font: 10px var(--console-mono);
+  font: 12px var(--console-mono);
   margin-top: 22px;
   color: #d0d0c7;
 }
@@ -316,12 +317,12 @@ main {
 }
 .workload-columns span {
   display: block;
-  font: 8px var(--console-mono);
+  font: 12px var(--console-mono);
   color: #85857e;
   margin-bottom: 8px;
 }
 .workload-columns strong {
-  font: 12px var(--console-mono);
+  font: 15px var(--console-mono);
   color: #d8d8ce;
 }
 .operation-actions {
@@ -336,9 +337,9 @@ main {
   justify-content: space-between;
   border: 1px solid #50504a;
   padding: 8px 10px;
-  font: 9px var(--console-mono);
+  font: 12px var(--console-mono);
   letter-spacing: 0.25px;
-  min-height: 30px;
+  min-height: 40px;
   transition:
     background 0.18s,
     color 0.18s;
@@ -360,18 +361,18 @@ main {
   padding: 19px 22px;
 }
 .panel-title h2 {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
 }
 .count {
-  font: 9px var(--console-mono);
+  font: 12px var(--console-mono);
   border: 1px solid #373737;
   background: transparent;
   border-radius: 1px;
   color: #bcbcb4;
 }
 .tabs button {
-  font-size: 10px;
+  font-size: 14px;
 }
 .tabs button.active {
   font-weight: 500;
@@ -396,7 +397,7 @@ select {
 }
 th {
   font-family: var(--console-mono);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 400;
   color: #91918a;
   padding-top: 14px;
@@ -413,19 +414,19 @@ tbody tr:hover {
   background: #161616;
 }
 .row-title strong {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
 }
 .row-title small,
 .evidence-count,
 .panel-foot {
-  font-size: 10px;
+  font-size: 12px;
 }
 .badge {
   background: transparent !important;
   border: 1px solid #363636;
   border-radius: 2px;
-  font: 9px var(--console-mono);
+  font: 12px var(--console-mono);
   padding: 5px 7px;
 }
 .panel-foot {
@@ -446,7 +447,7 @@ tbody tr:hover {
   letter-spacing: -0.3px;
 }
 .section-heading .eyebrow {
-  font-size: 8px;
+  font-size: 12px;
   color: #8f8f89;
   margin-bottom: 9px;
 }
@@ -472,20 +473,20 @@ tbody tr:hover {
   color: #a9a9a1;
 }
 .fixture-number {
-  font: 11px var(--console-mono);
+  font: 14px var(--console-mono);
   letter-spacing: 1px;
 }
 .fixture-card h3 {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   margin-top: 23px;
 }
 .fixture-card p {
-  font-size: 11px;
+  font-size: 14px;
   color: #92928c;
 }
 .fixture-link {
-  font: 9px var(--console-mono);
+  font: 12px var(--console-mono);
   margin-top: 22px;
   color: #cacac0;
 }
@@ -494,11 +495,11 @@ tbody tr:hover {
   margin-top: 22px;
 }
 .quiet-note p {
-  font-size: 10px;
+  font-size: 12px;
   color: #92928b;
 }
 .app-footer {
-  font: 9px var(--console-mono);
+  font: 12px var(--console-mono);
   color: #85857e;
 }
 .empty {
@@ -516,7 +517,7 @@ tbody tr:hover {
   letter-spacing: -0.5px;
 }
 .empty p {
-  font-size: 12px;
+  font-size: 15px;
 }
 .modal,
 .toast {
@@ -546,10 +547,10 @@ tbody tr:hover {
     font-size: 23px;
   }
   .instrument-label {
-    font-size: 9px;
+    font-size: 12px;
   }
   .operation-actions button {
-    font-size: 8px;
+    font-size: 12px;
   }
   .workload-columns {
     flex-wrap: wrap;
